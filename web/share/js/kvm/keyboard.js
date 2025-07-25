@@ -30,6 +30,7 @@ export function Keyboard(__recordWsEvent) {
 	/************************************************************************/
 
 	var __ws = null;
+	var __enabled = true;
 	var __online = true;
 
 	var __keypad = null;
@@ -66,7 +67,8 @@ export function Keyboard(__recordWsEvent) {
 		__updateOnlineLeds();
 	};
 
-	self.setState = function(online, leds, hid_online, hid_busy) {
+	self.setState = function(enabled, online, leds, hid_online, hid_busy) {
+		__enabled = enabled
 		if (!hid_online) {
 			__online = null;
 		} else {
@@ -85,6 +87,17 @@ export function Keyboard(__recordWsEvent) {
 				}
 			}
 		}
+
+		tools.feature.setEnabled($("hid-reset-button"), __enabled);
+		tools.feature.setEnabled($("hid-settings"), __enabled);
+		tools.feature.setEnabled($("hid-keyboard-bad-link"), __enabled);
+		tools.feature.setEnabled($("hid-mute"), __enabled);
+		tools.feature.setEnabled($("hid-connect"), __enabled);
+		tools.feature.setEnabled($("hid-jiggler"), __enabled);
+		tools.feature.setEnabled($("keyboard-button"), __enabled);
+		tools.feature.setEnabled($("shortcuts-dropdown"), __enabled);
+		tools.feature.setEnabled($("text-dropdown"), __enabled);
+		tools.feature.setEnabled($("macro-dropdown"), __enabled);
 	};
 
 	self.releaseAll = function() {
@@ -96,33 +109,38 @@ export function Keyboard(__recordWsEvent) {
 	};
 
 	var __updateOnlineLeds = function() {
-		let is_captured = (
-			$("stream-window").classList.contains("window-active")
-			|| $("keyboard-window").classList.contains("window-active")
-		);
-		let led = "led-gray";
-		let title = "Keyboard free";
+		tools.feature.setEnabled($("hid-keyboard-led"), __enabled);
 
-		if (__ws) {
-			if (__online === null) {
-				led = "led-red";
-				title = (is_captured ? "Keyboard captured, HID offline" : "Keyboard free, HID offline");
-			} else if (__online) {
-				if (is_captured) {
-					led = "led-green";
-					title = "Keyboard captured";
+		if (__enabled)
+		{
+			let is_captured = (
+				$("stream-window").classList.contains("window-active")
+				|| $("keyboard-window").classList.contains("window-active")
+			);
+			let led = "led-gray";
+			let title = "Keyboard free";
+
+			if (__ws) {
+				if (__online === null) {
+					led = "led-red";
+					title = (is_captured ? "Keyboard captured, HID offline" : "Keyboard free, HID offline");
+				} else if (__online) {
+					if (is_captured) {
+						led = "led-green";
+						title = "Keyboard captured";
+					}
+				} else {
+					led = "led-yellow";
+					title = (is_captured ? "Keyboard captured, inactive/busy" : "Keyboard free, inactive/busy");
 				}
 			} else {
-				led = "led-yellow";
-				title = (is_captured ? "Keyboard captured, inactive/busy" : "Keyboard free, inactive/busy");
+				if (is_captured) {
+					title = "Keyboard captured, PiKVM offline";
+				}
 			}
-		} else {
-			if (is_captured) {
-				title = "Keyboard captured, PiKVM offline";
-			}
+			$("hid-keyboard-led").className = led;
+			$("hid-keyboard-led").title = title;
 		}
-		$("hid-keyboard-led").className = led;
-		$("hid-keyboard-led").title = title;
 	};
 
 	var __keyboardHandler = function(ev, state) {

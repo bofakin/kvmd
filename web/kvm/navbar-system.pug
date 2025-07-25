@@ -81,7 +81,7 @@ li.right#system-dropdown
 				td #[a(target="_blank" href="https://docs.pikvm.org/mouse") Mouse mode]:
 				td #[div.radio-box#hid-outputs-mouse-box]
 
-		+menu_spoiler("Keyboard &amp; mouse (HID) settings")
+		+menu_spoiler("Keyboard &amp; mouse (HID) settings", "hid-settings")
 			+menu_switch_table("hid-keyboard-swap-cc-switch", true, false) Swap Left Ctrl and Caps keys:
 			hr
 			table(class="kv")
@@ -106,7 +106,7 @@ li.right#system-dropdown
 				tr
 					+menu_switch_td2("hid-mouse-dot-switch", true, true) Show the blue dot:
 
-		+menu_spoiler("Web UI settings")
+		+menu_spoiler("Web UI settings", "web-ui-settings")
 			table.kv
 				tr
 					+menu_switch_td2("page-close-ask-switch", true, true) Ask page close confirmation:
@@ -116,14 +116,14 @@ li.right#system-dropdown
 					+menu_switch_td2("stream-suspend-switch", true, false) Suspend stream when tab is not active:
 
 		table.kv
-			tr
+			tr#hid-keyboard-bad-link
 				+menu_switch_td2("hid-keyboard-bad-link-switch", true, false) Bad link mode (release keys immediately):
 			tr.feature-disabled#hid-connect
 				+menu_switch_td2("hid-connect-switch", true, true) Connect HID to Server:
 			tr.feature-disabled#hid-jiggler
 				+menu_switch_td2("hid-jiggler-switch", false, false)
 					| #[a(target="_blank" href="https://docs.pikvm.org/mouse_jiggler") Mouse jiggler]:
-			tr
+			tr#hid-mute
 				+menu_switch_td2("hid-mute-switch", true, false) Mute all input HID events:
 			tr.feature-disabled#v3-usb-breaker
 				+menu_switch_td2_gpio(
@@ -135,5 +135,5 @@ li.right#system-dropdown
 		hr
 
 		.buttons.buttons-row
-			button.row50(data-force-hide-menu data-show-window="keyboard-window") &bull; Show keyboard
+			button.row50#keyboard-button(data-force-hide-menu data-show-window="keyboard-window") &bull; Show keyboard
 			button.row50#hid-reset-button(disabled) Reset HID
