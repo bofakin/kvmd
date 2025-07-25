@@ -33,6 +33,7 @@ export function Mouse(__getGeometry, __recordWsEvent) {
 	/************************************************************************/
 
 	var __ws = null;
+	var __enabled = true;
 	var __online = true;
 	var __abs = true;
 
@@ -95,7 +96,8 @@ export function Mouse(__getGeometry, __recordWsEvent) {
 		__updateOnlineLeds();
 	};
 
-	self.setState = function(online, abs, hid_online, hid_busy) {
+	self.setState = function(enabled, online, abs, hid_online, hid_busy) {
+		__enabled = enabled
 		if (!hid_online) {
 			__online = null;
 		} else {
@@ -145,43 +147,48 @@ export function Mouse(__getGeometry, __recordWsEvent) {
 	};
 
 	var __updateOnlineLeds = function() {
-		let is_captured;
-		if (__abs) {
-			is_captured = (__stream_hovered || tools.browser.is_mobile);
-		} else {
-			is_captured = __isRelativeCaptured();
-		}
-		let led = "led-gray";
-		let title = "Mouse free";
+		tools.feature.setEnabled($("hid-mouse-led"), __enabled);
 
-		if (__ws) {
-			if (__online === null) {
-				led = "led-red";
-				title = (is_captured ? "Mouse captured, HID offline" : "Mouse free, HID offline");
-			} else if (__online) {
-				if (is_captured) {
-					led = "led-green";
-					title = "Mouse captured";
+		if (__enabled)
+		{
+			let is_captured;
+			if (__abs) {
+				is_captured = (__stream_hovered || tools.browser.is_mobile);
+			} else {
+				is_captured = __isRelativeCaptured();
+			}
+			let led = "led-gray";
+			let title = "Mouse free";
+
+			if (__ws) {
+				if (__online === null) {
+					led = "led-red";
+					title = (is_captured ? "Mouse captured, HID offline" : "Mouse free, HID offline");
+				} else if (__online) {
+					if (is_captured) {
+						led = "led-green";
+						title = "Mouse captured";
+					}
+				} else {
+					led = "led-yellow";
+					title = (is_captured ? "Mouse captured, inactive/busy" : "Mouse free, inactive/busy");
 				}
 			} else {
-				led = "led-yellow";
-				title = (is_captured ? "Mouse captured, inactive/busy" : "Mouse free, inactive/busy");
+				if (is_captured) {
+					title = "Mouse captured, PiKVM offline";
+				}
 			}
-		} else {
-			if (is_captured) {
-				title = "Mouse captured, PiKVM offline";
-			}
-		}
-		$("hid-mouse-led").className = led;
-		$("hid-mouse-led").title = title;
+			$("hid-mouse-led").className = led;
+			$("hid-mouse-led").title = title;
 
-		if (__abs && is_captured) {
-			let dot = $("hid-mouse-dot-switch").checked;
-			$("stream-box").classList.toggle("stream-box-mouse-dot", (dot && __ws));
-			$("stream-box").classList.toggle("stream-box-mouse-none", (!dot && __ws));
-		} else {
-			$("stream-box").classList.toggle("stream-box-mouse-dot", false);
-			$("stream-box").classList.toggle("stream-box-mouse-none", false);
+			if (__abs && is_captured) {
+				let dot = $("hid-mouse-dot-switch").checked;
+				$("stream-box").classList.toggle("stream-box-mouse-dot", (dot && __ws));
+				$("stream-box").classList.toggle("stream-box-mouse-none", (!dot && __ws));
+			} else {
+				$("stream-box").classList.toggle("stream-box-mouse-dot", false);
+				$("stream-box").classList.toggle("stream-box-mouse-none", false);
+			}
 		}
 	};
 

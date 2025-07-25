@@ -74,8 +74,8 @@ mixin menu_slider_td3(slider_id, value_id, enabled)
 	td.value-number(id=value_id)
 
 
-mixin menu_spoiler(title)
-	details
+mixin menu_spoiler(title, spoiler_id)
+	details(id=spoiler_id)
 		summary !{title}
 		div(class="spoiler")
 			block

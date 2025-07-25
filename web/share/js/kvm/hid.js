@@ -130,13 +130,13 @@ export function Hid(__getGeometry, __recorder) {
 					state.keyboard.online !== undefined || state.keyboard.leds !== undefined
 					|| state.online !== undefined || state.busy !== undefined
 				) {
-					__keyboard.setState(__state.keyboard.online, __state.keyboard.leds, __state.online, __state.busy);
+					__keyboard.setState(__state.enabled, __state.keyboard.online, __state.keyboard.leds, __state.online, __state.busy);
 				}
 				if (
 					state.mouse.online !== undefined || state.mouse.absolute !== undefined
 					|| state.online !== undefined || state.busy !== undefined
 				) {
-					__mouse.setState(__state.mouse.online, __state.mouse.absolute, __state.online, __state.busy);
+					__mouse.setState(__state.enabled, __state.mouse.online, __state.mouse.absolute, __state.online, __state.busy);
 				}
 				if (state.online !== undefined || state.busy !== undefined) {
 					tools.radio.setEnabled("hid-outputs-keyboard-radio", (__state.online && !__state.busy));

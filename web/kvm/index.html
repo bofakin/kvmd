@@ -302,7 +302,7 @@
               </td>
             </tr>
           </table>
-              <details>
+              <details id="hid-settings">
                 <summary>Keyboard &amp; mouse (HID) settings</summary>
                 <div class="spoiler">
                       <table class="kv">
@@ -402,7 +402,7 @@
                   </table>
                 </div>
               </details>
-              <details>
+              <details id="web-ui-settings">
                 <summary>Web UI settings</summary>
                 <div class="spoiler">
                   <table class="kv">
@@ -440,7 +440,7 @@
                 </div>
               </details>
           <table class="kv">
-            <tr>
+            <tr id="hid-keyboard-bad-link">
                   <td>Bad link mode (release keys immediately):
                   </td>
                   <td align="right">
@@ -470,7 +470,7 @@
                     </div>
                   </td>
             </tr>
-            <tr>
+            <tr id="hid-mute">
                   <td>Mute all input HID events:
                   </td>
                   <td align="right">
@@ -503,7 +503,7 @@
           </table>
           <hr>
           <div class="buttons buttons-row">
-            <button class="row50" data-force-hide-menu data-show-window="keyboard-window">&bull; Show keyboard</button>
+            <button class="row50" id="keyboard-button" data-force-hide-menu data-show-window="keyboard-window">&bull; Show keyboard</button>
             <button class="row50" id="hid-reset-button" disabled>Reset HID</button>
           </div>
         </div>
