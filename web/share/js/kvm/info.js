@@ -26,6 +26,9 @@
 import {ROOT_PREFIX} from "../vars.js";
 import {tools, $} from "../tools.js";
 
+function Window2Extra(el_win) {
+	return el_win.id.substring(0, el_win.id.lastIndexOf("-window"));	
+}
 
 export function Info() {
 	var self = this;
@@ -249,6 +252,8 @@ export function Info() {
 	var __setStateExtras = function(state) {
 		let show_hook = null;
 		let close_hook = null;
+		let show_hook_browser = null;
+		let close_hook_browser = null;
 		let has_webterm = (state.webterm && (state.webterm.enabled || state.webterm.started));
 		if (has_webterm) {
 			let loc = window.location;
@@ -257,18 +262,29 @@ export function Info() {
 			// when the location doesn't have tailing slash: "foo -> foo/".
 			// Reverse proxy over PiKVM can be misconfigured to handle this.
 			let url = base + state.webterm.path + "/?disableLeaveAlert=true";
-			show_hook = function() {
+			show_hook = function(el_win) {
 				tools.info("Terminal opened: ", url);
-				$("webterm-iframe").src = url;
+				$(Window2Extra(el_win) + "-iframe").src = url;
 			};
-			close_hook = function() {
+			close_hook = function(el_win) {
 				tools.info("Terminal closed");
-				$("webterm-iframe").src = "";
+				$(Window2Extra(el_win) + "-iframe").src = "";
+			};
+			show_hook_browser = function(el_win) {
+				var browser_url = "http://alexa35-50132.tfe.arri.de/"
+				tools.info("Browser opened: ", browser_url);
+				$(Window2Extra(el_win) + "-iframe").src = browser_url;
+			};
+			close_hook_browser = function(el_win) {
+				tools.info("Browser closed");
+				$(Window2Extra(el_win) + "-iframe").src = "";
 			};
 		}
 		tools.feature.setEnabled($("system-tool-webterm"), has_webterm);
 		$("webterm-window").show_hook = show_hook;
 		$("webterm-window").close_hook = close_hook;
+		$("browser-window").show_hook = show_hook_browser;
+		$("browser-window").close_hook = close_hook_browser;
 	};
 
 	__init__();

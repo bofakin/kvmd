@@ -399,7 +399,7 @@ function __WindowManager() {
 		el_win.style.visibility = "visible";
 		__activateWindow(el_win);
 		if (showed && el_win.show_hook) {
-			el_win.show_hook();
+			el_win.show_hook(el_win);
 		}
 	};
 
@@ -448,7 +448,7 @@ function __WindowManager() {
 		el_win.blur();
 		el_win.style.visibility = "hidden";
 		if (el_win.close_hook) {
-			el_win.close_hook();
+			el_win.close_hook(el_win);
 		}
 	};
 
