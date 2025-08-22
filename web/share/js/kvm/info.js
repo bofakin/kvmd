@@ -301,9 +301,9 @@ export function Info() {
 		
 		for (let app of apps) {
 			if (app.place >= 0 && (app.enabled || app.started)) {
+				//<img class="led-gray"dd src="${tools.escape(ROOT_PREFIX + app.icon)}">
 				html += `<div class="buttons buttons-row">
 							<button class="row100">
-								<img class="svg-gray" src="${tools.escape(ROOT_PREFIX + app.icon)}">
 								${app.name}
 							</button>
 						</div>`;
