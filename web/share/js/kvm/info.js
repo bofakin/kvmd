@@ -285,6 +285,33 @@ export function Info() {
 		$("webterm-window").close_hook = close_hook;
 		$("browser-window").show_hook = show_hook_browser;
 		$("browser-window").close_hook = close_hook_browser;
+
+		let apps = [];
+		apps = Object.values(state).sort(function(a, b) {
+			if (a.place < b.place) {
+				return -1;
+			} else if (a.place > b.place) {
+				return 1;
+			} else {
+				return 0;
+			}
+		});
+
+		let html = "";
+		
+		for (let app of apps) {
+			if (app.place >= 0 && (app.enabled || app.started)) {
+				html += `<div class="buttons buttons-row">
+							<button class="row100">
+								<img class="svg-gray" src="${tools.escape(ROOT_PREFIX + app.icon)}">
+								${app.name}
+							</button>
+						</div>`;
+			}
+		}
+		
+		$("extras-menu").innerHTML = html;
+
 	};
 
 	__init__();
