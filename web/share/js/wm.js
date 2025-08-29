@@ -54,6 +54,60 @@ function __WindowManager() {
 			tools.error("ResizeObserver not supported");
 		}
 
+		self.setWindowEvents();
+		self.setButtonEvents();
+
+		window.addEventListener("mouseup", __globalMouseButtonHandler);
+		window.addEventListener("touchend", __globalMouseButtonHandler);
+
+		window.addEventListener("focusin", (ev) => __focusInOut(ev.target, true));
+		window.addEventListener("focusout", (ev) => __focusInOut(ev.target, false));
+
+		// Окна с iframe нуждаются в особенной логике для подсветки,
+		// потому что из iframe не приходят события фокуса.
+		// Мы можешь лишь следить за focus/blur на окне и проверять
+		// активный элемент, и если это iframe - назодить его окно,
+		// и подсвечивать его. Или наоборот, тушить все окна,
+		// в которых есть другие iframe.
+		window.addEventListener("focus", function() {
+			let el_active = document.activeElement;
+			for (let el of document.getElementsByTagName("iframe")) {
+				if (el !== el_active) {
+					__focusInOut(el, false);
+				}
+			}
+		});
+		window.addEventListener("blur", function() {
+			// При переходе в iframe, в хромиуме прилетает два блура:
+			// с первым активный элемент становится body, со вторым - iframe.
+			// В фоксе оба раза это будет body, но если проверить чуть позже -
+			// то станет iframe. Таймаут решает проблему.
+			setTimeout(function() {
+				let el = document.activeElement;
+				if (el && el.tagName.toLowerCase() === "iframe") {
+					let el_parent = __focusInOut(el, true);
+					if (el_parent !== null) {
+						__activateWindow(el_parent);
+					}
+				}
+			}, 100);
+		});
+
+		window.addEventListener("resize", __organizeWindowsOnBrowserResize);
+		window.addEventListener("orientationchange", __organizeWindowsOnBrowserResize);
+
+		document.addEventListener("fullscreenchange", __onFullScreenChange);
+
+		document.addEventListener("keyup", function(ev) {
+			if (__catch_menu_esc && ev.code === "Escape") {
+				ev.preventDefault();
+				__closeAllMenues();
+				__activateLastWindow();
+			}
+		});
+	};
+
+	self.setWindowEvents = function() {
 		for (let el_win of $$("window")) {
 			el_win.tabIndex = -1;
 			__makeWindowMovable(el_win);
@@ -170,59 +224,12 @@ function __WindowManager() {
 				}
 			}
 		}
+	};
 
+	self.setButtonEvents = function() {
 		for (let el of $$$("button[data-show-window]")) {
 			tools.el.setOnClick(el, () => self.showWindow($(el.getAttribute("data-show-window"))));
 		}
-
-		window.addEventListener("mouseup", __globalMouseButtonHandler);
-		window.addEventListener("touchend", __globalMouseButtonHandler);
-
-		window.addEventListener("focusin", (ev) => __focusInOut(ev.target, true));
-		window.addEventListener("focusout", (ev) => __focusInOut(ev.target, false));
-
-		// Окна с iframe нуждаются в особенной логике для подсветки,
-		// потому что из iframe не приходят события фокуса.
-		// Мы можешь лишь следить за focus/blur на окне и проверять
-		// активный элемент, и если это iframe - назодить его окно,
-		// и подсвечивать его. Или наоборот, тушить все окна,
-		// в которых есть другие iframe.
-		window.addEventListener("focus", function() {
-			let el_active = document.activeElement;
-			for (let el of document.getElementsByTagName("iframe")) {
-				if (el !== el_active) {
-					__focusInOut(el, false);
-				}
-			}
-		});
-		window.addEventListener("blur", function() {
-			// При переходе в iframe, в хромиуме прилетает два блура:
-			// с первым активный элемент становится body, со вторым - iframe.
-			// В фоксе оба раза это будет body, но если проверить чуть позже -
-			// то станет iframe. Таймаут решает проблему.
-			setTimeout(function() {
-				let el = document.activeElement;
-				if (el && el.tagName.toLowerCase() === "iframe") {
-					let el_parent = __focusInOut(el, true);
-					if (el_parent !== null) {
-						__activateWindow(el_parent);
-					}
-				}
-			}, 100);
-		});
-
-		window.addEventListener("resize", __organizeWindowsOnBrowserResize);
-		window.addEventListener("orientationchange", __organizeWindowsOnBrowserResize);
-
-		document.addEventListener("fullscreenchange", __onFullScreenChange);
-
-		document.addEventListener("keyup", function(ev) {
-			if (__catch_menu_esc && ev.code === "Escape") {
-				ev.preventDefault();
-				__closeAllMenues();
-				__activateLastWindow();
-			}
-		});
 	};
 
 	/************************************************************************/

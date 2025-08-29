@@ -25,6 +25,7 @@
 
 import {ROOT_PREFIX} from "../vars.js";
 import {tools, $} from "../tools.js";
+import {wm} from "../wm.js";
 
 function Window2Extra(el_win) {
 	return el_win.id.substring(0, el_win.id.lastIndexOf("-window"));	
@@ -297,22 +298,47 @@ export function Info() {
 			}
 		});
 
-		let html = "";
+		let extras_menu_html = "";
+		let system_menu_html = "";
+		let windows_html = "";
 		
 		for (let app of apps) {
 			if (app.place >= 0 && (app.enabled || app.started)) {
-				//<img class="led-gray"dd src="${tools.escape(ROOT_PREFIX + app.icon)}">
-				html += `<div class="buttons buttons-row">
-							<button class="row100">
-								${app.name}
-							</button>
-						</div>`;
+				let tag = app.name.toLowerCase();
+				extras_menu_html += __makeExtrasMenuEntry(app, tag);
+				windows_html += __makeWindow(app, tag);
 			}
 		}
 		
-		$("extras-menu").innerHTML = html;
+		$("extras-menu").innerHTML = extras_menu_html;
+		$("extras-windows").innerHTML = windows_html;
 
+		wm.setButtonEvents();		
+		wm.setWindowEvents();		
 	};
 
 	__init__();
+}
+
+function __makeExtrasMenuEntry(app, tag) {
+	//<img class="TODO: led-gray" src="${tools.escape(ROOT_PREFIX + app.icon)}">
+	return `<div class="buttons buttons-row">
+		<button class="row100" data-force-hide-menu data-show-window="${tag}-window">
+			&bull; ${app.name}
+		</button>
+	</div>`;
+}
+
+function __makeWindow(app, tag) {
+	return `<div class="window window-resizable" id="${tag}-window" data-show-centered style="display: flex; min-width: 720px; min-height: 480px">
+      <div class="window-header">
+        <div class="window-grab">${app.name}</div>
+        <div class="window-buttons">
+          <button class="window-button-original">&bull;</button>
+          <button class="window-button-maximize">&#9744;</button>
+          <button class="window-button-close"><b>&times;</b></button>
+        </div>
+      </div>
+      <iframe id="${tag}-iframe" src="" style="width: 100%; flex: 1"></iframe>
+    </div>`
 }
