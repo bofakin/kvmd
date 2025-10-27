@@ -250,9 +250,13 @@ export function Info() {
 	var __colored = (ok, html) => `<font color="${ok ? "green" : "red"}">${html}</font>`;
 	var __commented = (html) => `<span class="code-comment">${html}</span>`;
 
+	var __urlmap = new Map();
+
 	var __setStateExtras = function(state) {
 		let show_hook = null;
 		let close_hook = null;
+		let show_hook_extra = null;
+		let close_hook_extra = null;
 		let has_webterm = (state.webterm && (state.webterm.enabled || state.webterm.started));
 		if (has_webterm) {
 			let loc = window.location;
@@ -288,20 +292,39 @@ export function Info() {
 		let extras_menu_html = "";
 		let system_menu_html = "";
 		let windows_html = "";
-		
+
 		for (let app of apps) {
 			if (app.place >= 0 && (app.enabled || app.started)) {
 				let tag = app.name.toLowerCase();
 				extras_menu_html += __makeExtrasMenuEntry(app, tag);
 				windows_html += __makeWindow(app, tag);
+				__urlmap.set(tag, ROOT_PREFIX + app.path);
 			}
 		}
-		
+
 		$("extras-menu").innerHTML = extras_menu_html;
 		$("extras-windows").innerHTML = windows_html;
 
-		wm.setButtonEvents();		
-		wm.setWindowEvents();		
+		show_hook_extra = function(el_win) {
+			var browser_url = __urlmap.get(Window2Extra(el_win));
+			tools.info("Browser opened: ", browser_url);
+			$(Window2Extra(el_win) + "-iframe").src = browser_url;
+		};
+		close_hook_extra = function(el_win) {
+			tools.info("Browser closed");
+			$(Window2Extra(el_win) + "-iframe").src = "";
+		};
+
+		for (let app of apps) {
+			if (app.place >= 0 && (app.enabled || app.started)) {
+				let tag = app.name.toLowerCase();
+				$(tag + "-window").show_hook = show_hook_extra;
+				$(tag + "-window").close_hook = close_hook_extra;
+			}
+		}
+
+		wm.setButtonEvents();
+		wm.setWindowEvents();
 	};
 
 	__init__();
