@@ -253,8 +253,6 @@ export function Info() {
 	var __setStateExtras = function(state) {
 		let show_hook = null;
 		let close_hook = null;
-		let show_hook_browser = null;
-		let close_hook_browser = null;
 		let has_webterm = (state.webterm && (state.webterm.enabled || state.webterm.started));
 		if (has_webterm) {
 			let loc = window.location;
@@ -271,21 +269,10 @@ export function Info() {
 				tools.info("Terminal closed");
 				$(Window2Extra(el_win) + "-iframe").src = "";
 			};
-			show_hook_browser = function(el_win) {
-				var browser_url = "http://alexa35-50132.tfe.arri.de/"
-				tools.info("Browser opened: ", browser_url);
-				$(Window2Extra(el_win) + "-iframe").src = browser_url;
-			};
-			close_hook_browser = function(el_win) {
-				tools.info("Browser closed");
-				$(Window2Extra(el_win) + "-iframe").src = "";
-			};
 		}
 		tools.feature.setEnabled($("system-tool-webterm"), has_webterm);
 		$("webterm-window").show_hook = show_hook;
 		$("webterm-window").close_hook = close_hook;
-		$("browser-window").show_hook = show_hook_browser;
-		$("browser-window").close_hook = close_hook_browser;
 
 		let apps = [];
 		apps = Object.values(state).sort(function(a, b) {
